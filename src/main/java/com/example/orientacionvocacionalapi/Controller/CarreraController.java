@@ -4,6 +4,7 @@ import com.example.orientacionvocacionalapi.model.entity.Carrera;
 import com.example.orientacionvocacionalapi.model.entity.Ubicacion;
 import com.example.orientacionvocacionalapi.repository.CarreraRepository;
 import com.example.orientacionvocacionalapi.repository.UbicacionRepository;
+import com.example.orientacionvocacionalapi.service.impl.CarreraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,8 @@ public class CarreraController {
 
     @Autowired
     private UbicacionRepository ubicacionRepository;
+    @Autowired
+    private CarreraService carreraService;
 
 
     @PostMapping("/insertarubi")
@@ -51,5 +54,41 @@ public class CarreraController {
 
         List<Carrera> carreras = carreraRepository.findByUbicacion(ubicacion);
         return ResponseEntity.ok(carreras);
+    }
+
+    @GetMapping("/mostrarcarreras")
+    public ResponseEntity<List<Carrera>> obtenercarreras(){
+        List<Carrera> carreras = carreraRepository.findAll();
+        return ResponseEntity.ok(carreras);
+    }
+
+    @GetMapping("/mostrarubicaciones")
+    public ResponseEntity<List<Ubicacion>> obtenerUbicaciones() {
+        List<Ubicacion> ubicaciones = ubicacionRepository.findAll();
+        return ResponseEntity.ok(ubicaciones);
+    }
+
+    @GetMapping("/carreraporID/{carreraId}")
+    public ResponseEntity<?> obtenerCarrerasPorID(@PathVariable Long carreraId) {
+        try {
+            Carrera carrera = carreraService.getCarreraById(carreraId);
+            return ResponseEntity.ok(carrera);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al obtener el usuario: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/filtrarubicacionexacta")
+    public ResponseEntity<List<Carrera>> filtrarCarrerasPorUbicacion(
+            @RequestParam String ciudad,
+            @RequestParam String region,
+            @RequestParam String pais
+    ) {
+        List<Carrera> carreras = carreraService.obtenerCarrerasPorUbicacion(ciudad, region, pais);
+        if (carreras != null && !carreras.isEmpty()) {
+            return ResponseEntity.ok(carreras);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 }
