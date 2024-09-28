@@ -52,4 +52,10 @@ public class CarreraController {
         List<Carrera> carreras = carreraRepository.findByUbicacion(ubicacion);
         return ResponseEntity.ok(carreras);
     }
+
+    @GetMapping("/mostrarcarreras")
+    public ResponseEntity<List<Carrera>> obtenercarreras(){
+        List<Carrera> carreras = carreraRepository.findAll();
+        return ResponseEntity.ok(carreras);
+    }
 }
