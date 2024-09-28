@@ -32,4 +32,11 @@ public class UserService {
 
         usuarioRepository.save(user);
     }
+    public boolean login(String email, String password) {
+        User usuario = usuarioRepository.findByEmail(email);
+        if (usuario != null) {
+            return passwordEncoder.matches(password, usuario.getPassword());  // Compara contraseñas
+        }
+        return false;
+    }
 }
