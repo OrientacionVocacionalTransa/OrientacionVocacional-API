@@ -20,7 +20,11 @@ public class CarreraController {
     @Autowired
     private UbicacionRepository ubicacionRepository;
 
-
+    @PostMapping("/insertarubi")
+    public ResponseEntity<Ubicacion> agregarUbicacion(@RequestBody Ubicacion ubicacion) {
+        Ubicacion nuevaUbicacion = ubicacionRepository.save(ubicacion);
+        return ResponseEntity.ok(nuevaUbicacion);
+    }
 
     @GetMapping("/porubicacion/{ubicacionId}")
     public ResponseEntity<List<Carrera>> obtenerCarrerasPorUbicacion(@PathVariable Long ubicacionId) {
