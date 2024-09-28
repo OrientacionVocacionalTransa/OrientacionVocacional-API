@@ -49,4 +49,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error al actualizar el usuario: " + e.getMessage());
         }
     }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            usuarioService.deleteUser(id);
+            return ResponseEntity.ok("Usuario eliminado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al eliminar el usuario: " + e.getMessage());
+        }
+    }
 }
