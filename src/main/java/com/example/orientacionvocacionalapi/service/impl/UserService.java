@@ -65,4 +65,8 @@ public class UserService {
                 .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
     }
 
+    public List<User> getAllUsers() {
+        return usuarioRepository.findAll();
+    }
+
 }
