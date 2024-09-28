@@ -1,6 +1,7 @@
 package com.example.orientacionvocacionalapi.Controller;
 
 import com.example.orientacionvocacionalapi.dto.UserDTO;
+import com.example.orientacionvocacionalapi.model.entity.User;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,4 +60,31 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error al eliminar el usuario: " + e.getMessage());
         }
     }
+
+    @GetMapping("/obtener/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            User user = usuarioService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al obtener el usuario: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/obtenertodos")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = usuarioService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @PutMapping("/{id}/encrypt-password")
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestParam String newPassword) {
+        try {
+            usuarioService.updateAndEncryptPassword(id, newPassword);
+            return ResponseEntity.ok("Contraseña actualizada y encriptada exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al actualizar la contraseña: " + e.getMessage());
+        }
+    }
+
 }

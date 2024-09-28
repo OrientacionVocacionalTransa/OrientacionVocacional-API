@@ -59,4 +59,30 @@ public class UserService {
 
         usuarioRepository.delete(user);
     }
+
+    public User getUserById(Long id) throws Exception {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
+    }
+
+    public List<User> getAllUsers() {
+        return usuarioRepository.findAll();
+    }
+
+    public void updateAndEncryptPassword(Long id, String newPassword) throws Exception {
+        User user = usuarioRepository.findById(id)
+                .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
+
+
+        String encryptedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encryptedPassword);
+
+
+        usuarioRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
 }
