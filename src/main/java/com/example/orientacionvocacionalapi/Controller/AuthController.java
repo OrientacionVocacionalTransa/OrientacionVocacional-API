@@ -1,6 +1,7 @@
 package com.example.orientacionvocacionalapi.Controller;
 
 import com.example.orientacionvocacionalapi.dto.UserDTO;
+import com.example.orientacionvocacionalapi.model.entity.User;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,4 +59,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error al eliminar el usuario: " + e.getMessage());
         }
     }
+
+    @GetMapping("/obtener/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            User user = usuarioService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al obtener el usuario: " + e.getMessage());
+        }
+    }
+
 }
