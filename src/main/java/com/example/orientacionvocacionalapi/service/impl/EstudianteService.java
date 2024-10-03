@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EstudianteService {
@@ -38,5 +39,9 @@ public class EstudianteService {
         estudiante.setPassword(passwordEncoder.encode(estudianteDTO.getPassword())); // Asegúrate de que estés utilizando un codificador de contraseñas
         estudiante.setRole(eRole);
         usuarioRepository.save(estudiante);
+    }
+
+    public Optional<Estudiante> obtenerPerfilEstudiantePorEmail(String email) {
+        return estudianteRepository.findByEmail(email);
     }
 }
