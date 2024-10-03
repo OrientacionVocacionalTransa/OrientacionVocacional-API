@@ -2,6 +2,7 @@ package com.example.orientacionvocacionalapi.Controller;
 
 import com.example.orientacionvocacionalapi.dto.UserDTO;
 import com.example.orientacionvocacionalapi.model.entity.User;
+import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +23,8 @@ public class AuthController {
     @Autowired
     private UserService usuarioService;
 
+    @Autowired
+    private JwtUtilService jwtUtilService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@Validated @RequestBody UserDTO usuarioDTO) {
@@ -117,6 +120,22 @@ public class AuthController {
                     .body(Map.of("error", "Error al restablecer la contraseña: " + e.getMessage()));
         }
     }
+    @GetMapping("/me")
+    public ResponseEntity<User> getUserInfo(@RequestHeader("Authorization") String token) {
 
+        String jwt = token.substring(7);
+
+
+        String email = jwtUtilService.extractUsername(jwt);
+
+
+        User usuario = usuarioService.findByEmail(email);
+
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 
 }
