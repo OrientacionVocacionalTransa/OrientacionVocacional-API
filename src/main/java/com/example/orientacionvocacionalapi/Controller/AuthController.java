@@ -1,9 +1,11 @@
 package com.example.orientacionvocacionalapi.Controller;
 
+import com.example.orientacionvocacionalapi.dto.AsesorDTO;
 import com.example.orientacionvocacionalapi.dto.EstudianteDTO;
 import com.example.orientacionvocacionalapi.dto.UserDTO;
 import com.example.orientacionvocacionalapi.dto.UserUpdateDTO;
 import com.example.orientacionvocacionalapi.model.entity.User;
+import com.example.orientacionvocacionalapi.service.impl.AsesorService;
 import com.example.orientacionvocacionalapi.service.impl.EstudianteService;
 import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
@@ -32,6 +34,9 @@ public class AuthController {
     @Autowired
     private EstudianteService estudianteService;
 
+    @Autowired
+    private AsesorService asesorService;
+
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@Validated @RequestBody UserDTO usuarioDTO) {
         try {
@@ -50,6 +55,17 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();  // Imprimir el stack trace para más detalles
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"Error al registrar el usuario: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @PostMapping("/registerasesor")
+    public ResponseEntity<?> registrarAsesor(@Validated @RequestBody AsesorDTO asesorDTO) {
+        try {
+            asesorService.registrarAsesor(asesorDTO);
+            return ResponseEntity.ok().body("{\"message\": \"Usuario registrado con éxito.\"}");
+        } catch (Exception e) {
+            e.printStackTrace();  // Imprimir el stack trace para más detalles
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\":\"Error al registrar el usuario:" + e.getMessage() + "\"}");
         }
     }
 
