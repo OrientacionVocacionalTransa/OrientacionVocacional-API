@@ -47,20 +47,7 @@ public class UserService {
         }
         return null;
     }
-    public void updateUser(Long id, UserDTO userDTO) throws Exception {
-        User user = usuarioRepository.findById(id)
-                .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
 
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setEmail(userDTO.getEmail());
-
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
-
-        usuarioRepository.save(user);
-    }
     public void deleteUser(Long id) throws Exception {
         User user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
@@ -136,6 +123,10 @@ public class UserService {
                 "<p>Atentamente,<br>El equipo de desarrollo de Orientacion Vocacional</p>", true);
 
         mailSender.send(message);
+    }
+
+    public User updateUser(User user) {
+        return usuarioRepository.save(user);
     }
 
 }
