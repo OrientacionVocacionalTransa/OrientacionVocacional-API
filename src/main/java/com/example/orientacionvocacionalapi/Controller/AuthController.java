@@ -38,8 +38,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestParam String email, @RequestParam String password) {
         Map<String, String> response = new HashMap<>();
-        if (usuarioService.login(email, password)) {
+        User usuario = usuarioService.login(email, password);
+
+
+        if (usuario != null) {
+
+            String token = jwtUtilService.generateToken(usuario);
+
             response.put("message", "Login exitoso");
+            response.put("token", token);
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "Credenciales incorrectas");
