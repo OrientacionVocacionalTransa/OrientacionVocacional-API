@@ -4,6 +4,7 @@ import com.example.orientacionvocacionalapi.repository.AsesorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +19,8 @@ public class AsesorService {
     }
 
 
-
+    public List<Asesor> listarTodosLosAsesores() {
+        return asesorRepository.findAll();
+    }
 
 }
