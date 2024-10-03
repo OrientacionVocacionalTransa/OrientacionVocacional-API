@@ -1,6 +1,7 @@
 package com.example.orientacionvocacionalapi.Controller;
 
 import com.example.orientacionvocacionalapi.dto.UserDTO;
+import com.example.orientacionvocacionalapi.dto.UserUpdateDTO;
 import com.example.orientacionvocacionalapi.model.entity.User;
 import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
@@ -38,21 +39,42 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestParam String email, @RequestParam String password) {
         Map<String, String> response = new HashMap<>();
-        if (usuarioService.login(email, password)) {
+        User usuario = usuarioService.login(email, password);
+
+
+        if (usuario != null) {
+
+            String token = jwtUtilService.generateToken(usuario);
+
             response.put("message", "Login exitoso");
+            response.put("token", token);
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "Credenciales incorrectas");
             return ResponseEntity.status(401).body(response);
         }
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        try {
-            usuarioService.updateUser(id, userDTO);
-            return ResponseEntity.ok("Usuario actualizado correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al actualizar el usuario: " + e.getMessage());
+    @PutMapping("/update")
+    public ResponseEntity<User> updateUserInfo(@RequestHeader("Authorization") String token,
+                                               @RequestBody UserUpdateDTO userUpdateDto) {
+
+        String jwt = token.substring(7);
+        String email = jwtUtilService.extractUsername(jwt);
+
+
+        User usuario = usuarioService.findByEmail(email);
+        if (usuario != null) {
+
+            usuario.setFirstName(userUpdateDto.getFirstName());
+            usuario.setLastName(userUpdateDto.getLastName());
+            usuario.setEmail(userUpdateDto.getEmail());
+
+
+            User updatedUser = usuarioService.updateUser(usuario);
+
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
     @DeleteMapping("/delete/{id}")

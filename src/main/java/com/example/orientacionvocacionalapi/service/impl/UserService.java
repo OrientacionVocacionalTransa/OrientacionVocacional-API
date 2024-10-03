@@ -40,27 +40,14 @@ public class UserService {
 
         usuarioRepository.save(user);
     }
-    public boolean login(String email, String password) {
+    public User login(String email, String password) {
         User usuario = usuarioRepository.findByEmail(email);
-        if (usuario != null) {
-            return passwordEncoder.matches(password, usuario.getPassword());  // Compara contraseñas
+        if (usuario != null && passwordEncoder.matches(password, usuario.getPassword())) {
+            return usuario;
         }
-        return false;
+        return null;
     }
-    public void updateUser(Long id, UserDTO userDTO) throws Exception {
-        User user = usuarioRepository.findById(id)
-                .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
 
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setEmail(userDTO.getEmail());
-
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
-
-        usuarioRepository.save(user);
-    }
     public void deleteUser(Long id) throws Exception {
         User user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
@@ -136,6 +123,10 @@ public class UserService {
                 "<p>Atentamente,<br>El equipo de desarrollo de Orientacion Vocacional</p>", true);
 
         mailSender.send(message);
+    }
+
+    public User updateUser(User user) {
+        return usuarioRepository.save(user);
     }
 
 }
