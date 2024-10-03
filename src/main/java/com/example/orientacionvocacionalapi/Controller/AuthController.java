@@ -4,6 +4,7 @@ import com.example.orientacionvocacionalapi.dto.UserDTO;
 import com.example.orientacionvocacionalapi.model.entity.User;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -86,5 +87,36 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error al actualizar la contraseña: " + e.getMessage());
         }
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        try {
+            usuarioService.generateResetPasswordToken(email);
+            // Devuelve una respuesta con encabezado de tipo JSON
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .body(Map.of("message", "Se ha enviado un correo con instrucciones para restablecer su contraseña."));
+        } catch (Exception e) {
+            // Devuelve una respuesta con encabezado de tipo JSON en caso de error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .body(Map.of("error", "Error al generar el token de recuperación: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        try {
+            usuarioService.resetPassword(token, newPassword);
+            // Devolver un JSON con un mensaje de éxito
+            return ResponseEntity.ok(Map.of("message", "Contraseña actualizada exitosamente."));
+        } catch (Exception e) {
+            e.printStackTrace(); // Log del error para depuración
+            // Devolver un JSON con el mensaje de error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Error al restablecer la contraseña: " + e.getMessage()));
+        }
+    }
+
 
 }
