@@ -3,11 +3,16 @@ package com.example.orientacionvocacionalapi.service.impl;
 import com.example.orientacionvocacionalapi.dto.UserDTO;
 import com.example.orientacionvocacionalapi.model.entity.User;
 import com.example.orientacionvocacionalapi.repository.UserRepository;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -17,6 +22,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     public void registrarUsuario(UserDTO usuarioDTO) {
 
@@ -83,6 +91,51 @@ public class UserService {
 
     public User findByEmail(String email) {
         return usuarioRepository.findByEmail(email);
+    }
+
+    public void generateResetPasswordToken(String email) throws Exception {
+        User user = usuarioRepository.findByEmail(email);
+        if (user == null) {
+            throw new Exception("No se encontró un usuario con ese correo.");
+        }
+
+        String token = UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        usuarioRepository.save(user);
+
+
+        sendResetPasswordEmail(user.getEmail(), token);
+    }
+
+
+    public void resetPassword(String token, String newPassword) throws Exception {
+        User user = usuarioRepository.findByResetPasswordToken(token);
+        if (user == null) {
+            throw new Exception("Token inválido.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        usuarioRepository.save(user);
+    }
+
+
+    private void sendResetPasswordEmail(String email, String token) throws Exception {
+        String resetLink = "http://localhost:4200/reset-password?token=" + token;
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setTo(email);
+        helper.setSubject("Restablecer tu contraseña en OrientacionVocacional");
+        helper.setText("<p>Hola,</p>" +
+                "<p>Esperamos que estés teniendo un buen día. Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en Orientacion Vocacional, que está diseñada para ayudarte en tu camino de orientación vocacional.</p>" +
+                "<p>Si deseas restablecer tu contraseña, haz clic en el enlace de abajo:</p>" +
+                "<a href=\"" + resetLink + "\">Restablecer contraseña</a>" +
+                "<p>Si no solicitaste este cambio, puedes ignorar este correo.</p>" +
+                "<p>¡Gracias por formar parte de nuestra comunidad!</p>" +
+                "<p>Atentamente,<br>El equipo de desarrollo de Orientacion Vocacional</p>", true);
+
+        mailSender.send(message);
     }
 
 }
