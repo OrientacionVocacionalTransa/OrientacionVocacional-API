@@ -1,8 +1,10 @@
 package com.example.orientacionvocacionalapi.Controller;
 
+import com.example.orientacionvocacionalapi.dto.EstudianteDTO;
 import com.example.orientacionvocacionalapi.dto.UserDTO;
 import com.example.orientacionvocacionalapi.dto.UserUpdateDTO;
 import com.example.orientacionvocacionalapi.model.entity.User;
+import com.example.orientacionvocacionalapi.service.impl.EstudianteService;
 import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
 import com.example.orientacionvocacionalapi.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class AuthController {
     @Autowired
     private JwtUtilService jwtUtilService;
 
+    @Autowired
+    private EstudianteService estudianteService;
+
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@Validated @RequestBody UserDTO usuarioDTO) {
         try {
@@ -36,6 +41,18 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"Error al registrar el usuario.\"}");
         }
     }
+
+    @PostMapping("/registerstudent")
+    public ResponseEntity<?> registrarEstudiante(@Validated @RequestBody EstudianteDTO estudianteDTO) {
+        try {
+            estudianteService.registrarEstudiante(estudianteDTO);
+            return ResponseEntity.ok().body("{\"message\": \"Usuario registrado con éxito.\"}");
+        } catch (Exception e) {
+            e.printStackTrace();  // Imprimir el stack trace para más detalles
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"Error al registrar el usuario: " + e.getMessage() + "\"}");
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestParam String email, @RequestParam String password) {
         Map<String, String> response = new HashMap<>();
