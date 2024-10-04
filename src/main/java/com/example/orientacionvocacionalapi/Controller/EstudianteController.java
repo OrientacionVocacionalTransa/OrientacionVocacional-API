@@ -1,4 +1,5 @@
 package com.example.orientacionvocacionalapi.Controller;
+import com.example.orientacionvocacionalapi.dto.EstudianteDTO;
 import com.example.orientacionvocacionalapi.model.entity.Estudiante;
 import com.example.orientacionvocacionalapi.service.impl.EstudianteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ public class EstudianteController {
     private EstudianteService estudianteService;
 
     @GetMapping("/listarestudiantes")
-    public ResponseEntity<List<Estudiante>> listarEstudiantes() {
-        List<Estudiante> estudiantes = estudianteService.listarTodosLosEstudiantes();
+    public ResponseEntity<List<EstudianteDTO>> listarEstudiantes() {
+        List<EstudianteDTO> estudiantes = estudianteService.listarTodosLosEstudiantes();
         return ResponseEntity.ok(estudiantes);
     }
     @GetMapping("/perfil")
