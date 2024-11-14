@@ -1,4 +1,5 @@
 package com.example.orientacionvocacionalapi.model.entity;
+import com.example.orientacionvocacionalapi.model.enums.Plan;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.EnumType;
@@ -12,4 +13,6 @@ import lombok.Data;
 public class Student extends User{
     private String verificationCode;
     private boolean verified = false;
+    @Enumerated(EnumType.STRING)
+    private Plan plan;
 }
