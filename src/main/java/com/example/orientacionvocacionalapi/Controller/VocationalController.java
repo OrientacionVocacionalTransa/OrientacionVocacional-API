@@ -1,7 +1,13 @@
 package com.example.orientacionvocacionalapi.Controller;
-import com.example.orientacionvocacionalapi.model.entity.VocationalTest;
-import com.example.orientacionvocacionalapi.model.entity.Question;
+import com.example.orientacionvocacionalapi.Mapper.QuestionMapper;
+import com.example.orientacionvocacionalapi.dto.QuestionDTO;
+import com.example.orientacionvocacionalapi.model.entity.*;
 import com.example.orientacionvocacionalapi.repository.QuestionRepository;
+import com.example.orientacionvocacionalapi.repository.TestResultRepository;
+import com.example.orientacionvocacionalapi.service.impl.AreaService;
+import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
+import com.example.orientacionvocacionalapi.service.impl.VocationalTestService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/vocational-test")
@@ -16,42 +23,49 @@ import java.util.Map;
 public class VocationalController {
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private JwtUtilService jwtUtilService;
+    @Autowired
+    private VocationalTestService vocationalTestService;
+    @Autowired
+    private QuestionMapper questionMapper;
+    @Autowired
+    private TestResultRepository testResultRepository;
+    @Autowired
+    private AreaService areaService;
 
-    @PostMapping("/submit")
-    public ResponseEntity<ApiResponse> submitVocationalTest(@RequestBody VocationalTest test){
-        String result = calculateTestResult(test);
-        ApiResponse apiResponse = new ApiResponse(result);
-        return ResponseEntity.ok(apiResponse);
+    @PostMapping("/submit-register")
+    public ResponseEntity<Map<String, Object>> submitVocationalTest(
+            @RequestBody VocationalTest test,
+            HttpServletRequest request) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Integer userId = jwtUtilService.extractUserId(token);
+
+        Map<String, Object> result = vocationalTestService.calculateTestResultRegister(test, userId);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/questions")
-    public List<Question> getQuestions(){
+    public List<QuestionDTO> getQuestions(){
         List<Question> questions = questionRepository.findAll();
-        System.out.println("Preguntas enviadas: " + questions);
-        return questions;
+
+        return questions.stream()
+                .map(questionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+    @GetMapping("/results/{userId}")
+    public ResponseEntity<List<Career>> getRecommendedCareers(@PathVariable Long userId) {
+        TestResult result = testResultRepository.findFirstByUserIdOrderByDateRealizationDesc(userId)
+                .orElseThrow(() -> new RuntimeException("No se encontraron resultados para el usuario"));
+
+        return ResponseEntity.ok(result.getRecommendedCareers());
     }
 
-    private String calculateTestResult(VocationalTest test){
-        Map<String, Integer> areaScores = new HashMap<>();
 
-        for (Question question: test.getQuestions()){
-            if (question.getSelectedOption().getScore()==1){
-                String area = question.getArea();
-                areaScores.put(area, areaScores.getOrDefault(area, 0)+1);
-            }
-        }
-
-        String recommendedArea = "";
-        int maxScore = 0;
-
-        for (Map.Entry<String, Integer> entry : areaScores.entrySet()){
-            if(entry.getValue()>maxScore){
-                maxScore = entry.getValue();
-                recommendedArea = entry.getKey();
-            }
-        }
-
-        return "Area recomendada: "+ recommendedArea;
+    @GetMapping("/areas")
+    public List<Area> getAreas(){
+        return areaService.findAllArea();
     }
 }
 
