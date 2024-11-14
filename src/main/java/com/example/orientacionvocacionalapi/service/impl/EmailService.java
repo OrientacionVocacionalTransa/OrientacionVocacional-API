@@ -1,6 +1,9 @@
 package com.example.orientacionvocacionalapi.service.impl;
 
 
+import com.example.orientacionvocacionalapi.model.entity.Adviser;
+import com.example.orientacionvocacionalapi.model.entity.Advisory;
+import com.example.orientacionvocacionalapi.model.entity.Student;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +86,41 @@ public class EmailService {
         sendHtmlEmail(toEmail, subject, body);
     }
 
+    public String generateHtmlBodycreateAdvisory(Student student, Advisory advisory, Adviser adviser) {
+        return "<html>" +
+                "<head>" +
+                "<style>" +
+                "body {font-family: Arial, sans-serif;}" +
+                "h2 {color: #4CAF50;}" +
+                "p {font-size: 16px;}" +
+                ".footer {color: #555555; font-size: 14px; text-align: center; padding-top: 20px; border-top: 1px solid #ddd;}" +
+                ".footer a {color: #4CAF50; text-decoration: none;}" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<h2>¡Hola " + student.getFirstName() +" "+ student.getLastName()+ "!</h2>" +
+                "<p>Se ha programado una nueva asesoría para ti. Aquí están los detalles:</p>" +
+                "<table>" +
+                "<tr><td><strong>Nombre de la Asesoría:</strong></td><td>" + advisory.getName() + "</td></tr>" +
+                "<tr><td><strong>Link:</strong></td><td><a href='" + advisory.getLink() + "'>Acceder a la asesoría</a></td></tr>" +
+                "<tr><td><strong>Fecha:</strong></td><td>" + advisory.getDate() + "</td></tr>" +
+                "<tr><td><strong>Hora:</strong></td><td>" + advisory.getTime() + "</td></tr>" +
+                "<tr><td><strong>Asesor:</strong></td><td>" + adviser.getFirstName()  +" "+ adviser.getLastName()+ "</td></tr>" +
+                "</table>" +
+                "<p>Te recomendamos acceder al link de la asesoría a la hora programada.</p>" +
+                "<p>Si tienes alguna pregunta, no dudes en ponerte en contacto con nosotros.</p>" +
 
+                "<div class='footer'>" +
+                "<p>Atentamente,<br/>El equipo de Orientación Vocacional</p>" +
+                "<p><a href='mailto:soporte@orientacionvocacional.com'>soporte@orientacionvocacional.com</a></p>" +
+                "<p>Síguenos en nuestras redes sociales:</p>" +
+                "<p><a href='https://www.facebook.com/OrientacionVocacional'>Facebook</a> | <a href='https://www.twitter.com/OrientacionVocacional'>Twitter</a></p>" +
+                "<p><a href='https://www.instagram.com/OrientacionVocacional'>Instagram</a></p>" +
+                "<img src='https://img.freepik.com/fotos-premium/longitud-total-estudiantes-universitarios-felices-caminando-juntos-campus_763111-5348.jpg' alt='Logo' width='150' style='display:block; margin-top:20px;'/>" +
+                "</div>" +
+
+                "</body>" +
+                "</html>";
+    }
 }
 
