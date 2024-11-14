@@ -25,6 +25,8 @@ public class UserService {
 
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private UserRepository userRepository;
 
     public void registerUser(UserDTO usuarioDTO) {
 
@@ -75,6 +77,16 @@ public class UserService {
 
 
         usuarioRepository.save(user);
+    }
+
+    public void updateProfileImage(Integer userId, String newFilePath) {
+        User user = findById(userId);
+        user.setImg_profile(newFilePath);
+        userRepository.save(user);
+    }
+
+    public User findById(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public User findByEmail(String email) {

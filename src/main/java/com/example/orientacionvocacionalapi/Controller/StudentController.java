@@ -6,6 +6,7 @@ import com.example.orientacionvocacionalapi.repository.StudentRepository;
 import com.example.orientacionvocacionalapi.service.impl.EmailService;
 import com.example.orientacionvocacionalapi.service.impl.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,6 +50,15 @@ public class StudentController {
         return ResponseEntity.ok(Map.of("message", "Cuenta verificada con éxito"));
     }
 
+    @GetMapping("/getStudent/{id}")
+    public ResponseEntity<?> studentById(@PathVariable Long id) {
+        Optional<StudentDTO> student = Optional.ofNullable(studentService.findById(id));
+        if (student.isPresent()) {
+            return ResponseEntity.ok(student.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Estudiante no encontrado\"}");
+        }
+    }
 
     @PostMapping("/resend-verification-code")
     public ResponseEntity<Map<String, String>> resendVerificationCode(@RequestParam String email) {
