@@ -1,26 +1,26 @@
 package com.example.orientacionvocacionalapi.Controller;
 
-import com.example.orientacionvocacionalapi.dto.AdviserDTO;
-import com.example.orientacionvocacionalapi.dto.StudentDTO;
-import com.example.orientacionvocacionalapi.dto.UserDTO;
-import com.example.orientacionvocacionalapi.dto.UserUpdateDTO;
+import com.example.orientacionvocacionalapi.dto.*;
 import com.example.orientacionvocacionalapi.model.entity.Adviser;
 import com.example.orientacionvocacionalapi.model.entity.Student;
 import com.example.orientacionvocacionalapi.model.entity.User;
 import com.example.orientacionvocacionalapi.repository.AdviserRepository;
 import com.example.orientacionvocacionalapi.repository.StudentRepository;
-import com.example.orientacionvocacionalapi.service.impl.AdviserService;
-import com.example.orientacionvocacionalapi.service.impl.StudentService;
-import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
-import com.example.orientacionvocacionalapi.service.impl.UserService;
+import com.example.orientacionvocacionalapi.service.impl.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +48,10 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AdviserRepository adviserRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
+    @Autowired
+    private HttpServletRequest request;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Validated @RequestBody UserDTO userDTO) {
@@ -146,7 +150,55 @@ public class AuthController {
         }
     }
 
+    @PutMapping("/update-image")
+    public ResponseEntity<FileResponseDTO> updateProfileImage(@RequestParam("file") MultipartFile file,
+                                                              @RequestHeader("Authorization") String token) {
 
+        String jwt = token.substring(7);
+        Integer userId = jwtUtilService.extractUserId(jwt);
+
+
+        String newFilePath = fileStorageService.store(file);
+
+
+        userService.updateProfileImage(userId, newFilePath);
+
+
+        String host = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        String url = ServletUriComponentsBuilder.fromHttpUrl(host)
+                .path("/api/v1/auth/")
+                .path(newFilePath)
+                .toUriString();
+
+        FileResponseDTO response = new FileResponseDTO(url);
+        return ResponseEntity.ok(response);
+
+    }
+
+    @PostMapping("/upload")
+    public Map<String, String> uploadFile(@RequestParam("file") MultipartFile file) {
+        String path = fileStorageService.store(file);
+        String host = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        String url = ServletUriComponentsBuilder
+                .fromHttpUrl(host)
+                .path("/api/v1/auth/")
+                .path(path)
+                .toUriString();
+
+        return Map.of("url", url);
+    }
+
+
+    @GetMapping("{filename:.+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String filename) throws IOException {
+        Resource file = fileStorageService.loadResource(filename);
+        String contentType = Files.probeContentType(file.getFile().toPath());
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(file);
+    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
