@@ -16,11 +16,11 @@ import java.util.Collection;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository usuarioRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        User user = usuarioRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException("Usuario no encontrado: " + email);
         }

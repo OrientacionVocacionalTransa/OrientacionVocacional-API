@@ -9,16 +9,20 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Habilitar la seguridad basada en métodos si es necesario
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -27,19 +31,42 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/auth/registerstudent", "/auth/registerasesor").permitAll() // Rutas públicas
-                        .requestMatchers("/estudiantes/**").hasAnyAuthority(ERole.STUDENT.name(), ERole.ADVISER.name())// Solo ESTUDIANTE
-                        .requestMatchers("/asesores/**").hasAuthority(ERole.ADVISER.name())
-                        .requestMatchers("/asesores/perfil").permitAll()// Solo ASESOR
-                        .anyRequest().permitAll() // Todas las demás rutas se permiten
+                        .requestMatchers(
+                                "/auth/login", "/auth/register",
+                                "/auth/registerStudent", "/auth/registerAdviser",
+                                "/students/verify", "/students/resend-verification-code"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/students/**",
+                                "/api/v1/adviser/getAdviser/**",
+                                "/adviser/listAdvisors",
+                                "/api/v1/checkout/**"
+                        ).hasAnyAuthority(ERole.STUDENT.name(), ERole.ADVISER.name())
+                        .requestMatchers("/adviser/**").hasAnyAuthority(ERole.ADVISER.name(), ERole.STUDENT.name())
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)) // Sin estado
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Añadir filtro JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors().configurationSource(corsConfigurationSource());
 
         return http.build();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:4200");  // Origen permitido
+        configuration.addAllowedMethod("*");  // Permite todos los métodos (GET, POST, DELETE, etc.)
+        configuration.addAllowedHeader("*");  // Permite todos los encabezados
+        configuration.setAllowCredentials(true);  // Permite credenciales como cookies y encabezados de autenticación
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);  // Aplica a todas las rutas
+        return source;
     }
 
     @Bean
@@ -47,21 +74,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Configuración de CORS
-    @Bean
-    public WebMvcConfigurer corsConfigurer(){
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry){
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
-            }
-        };
-    }
-
-    // Bean para AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

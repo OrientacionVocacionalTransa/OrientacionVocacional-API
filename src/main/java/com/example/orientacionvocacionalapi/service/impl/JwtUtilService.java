@@ -16,8 +16,8 @@ import java.util.Map;
 
 @Service
 public class JwtUtilService {
-
-    private final long EXPIRATION_TIME = 86400000;  // 1 día en milisegundos
+    // Cambia esto a una clave más segura
+    private final long EXPIRATION_TIME = 86400000;
     private SecretKey secretKey;
 
     public JwtUtilService() {
@@ -26,9 +26,13 @@ public class JwtUtilService {
     }
 
 
-    public String generateToken(User usuario) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, usuario.getEmail());
+        claims.put("userId", user.getId());         //claims para obtener info del usuario by jeisson
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
+
+        return createToken(claims, user.getEmail());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -56,5 +60,14 @@ public class JwtUtilService {
 
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
+    }
+
+    public Integer extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        Object userId = claims.get("userId");
+        if (userId == null) {
+            throw new RuntimeException("El userId no está presente en el token");
+        }
+        return Integer.parseInt(userId.toString());
     }
 }
