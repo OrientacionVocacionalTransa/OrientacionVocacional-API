@@ -1,6 +1,9 @@
 package com.example.orientacionvocacionalapi.Controller;
 import com.example.orientacionvocacionalapi.dto.StudentDTO;
+import com.example.orientacionvocacionalapi.exception.BadRequestException;
 import com.example.orientacionvocacionalapi.model.entity.Student;
+import com.example.orientacionvocacionalapi.repository.StudentRepository;
+import com.example.orientacionvocacionalapi.service.impl.EmailService;
 import com.example.orientacionvocacionalapi.service.impl.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,6 +20,59 @@ import java.util.Optional;
 public class StudentController {
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private EmailService emailService;
+
+    @PostMapping("/verify")
+    public ResponseEntity<Map<String, String>> verifyStudent(@RequestParam String email, @RequestParam String verificationCode) {
+        Optional<Student> optionalStudent = studentRepository.findByEmail(email);
+
+        if (optionalStudent.isEmpty()) {
+            throw new BadRequestException("Estudiante no encontrado");
+        }
+
+        Student student = optionalStudent.get();
+        if (student.isVerified()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "La cuenta ya está verificada"));
+        }
+
+        if (!student.getVerificationCode().equals(verificationCode)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Código de verificación incorrecto"));
+        }
+
+        student.setVerified(true);
+        student.setVerificationCode(null);
+        studentRepository.save(student);
+
+        return ResponseEntity.ok(Map.of("message", "Cuenta verificada con éxito"));
+    }
+
+
+    @PostMapping("/resend-verification-code")
+    public ResponseEntity<Map<String, String>> resendVerificationCode(@RequestParam String email) {
+        Optional<Student> optionalStudent = studentRepository.findByEmail(email);
+
+        if (optionalStudent.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Estudiante no encontrado"));
+        }
+
+        Student student = optionalStudent.get();
+        if (student.isVerified()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "La cuenta ya está verificada"));
+        }
+
+
+        String newVerificationCode = studentService.generateVerificationCode();
+        student.setVerificationCode(newVerificationCode);
+        studentRepository.save(student);
+
+
+        emailService.sendVerificationEmail(student.getEmail(), newVerificationCode);
+
+        return ResponseEntity.ok(Map.of("message", "Nuevo código de verificación enviado"));
+    }
 
     @GetMapping("/listStudents")
     public ResponseEntity<List<StudentDTO>> listStudents() {
@@ -39,4 +96,6 @@ public class StudentController {
             return ResponseEntity.status(404).body("{\"error\": \"Perfil del Estudiante no encontrado.\"}");
         }
     }
+
+
 }

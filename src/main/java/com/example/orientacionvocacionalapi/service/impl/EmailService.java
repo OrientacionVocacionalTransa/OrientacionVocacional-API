@@ -1,0 +1,88 @@
+package com.example.orientacionvocacionalapi.service.impl;
+
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.MailException;
+
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+
+@Service
+public class EmailService {
+
+    @Autowired
+    private JavaMailSenderImpl mailSender;
+
+
+
+    public void sendEmailWithAttachment(String name, String lastname, String Email, MultipartFile archivo) throws MessagingException, IOException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+
+        helper.setTo("jeisson12aaron@gmail.com");
+        helper.setSubject("Solicitud de Postulación para el Cargo de Asesor de " + name + " " + lastname);
+
+        // Personaliza el mensaje del correo
+        String emailContent = String.format(
+                "Hola,\n\n" +
+                        "Me dirijo a usted con la intención de postularme para el cargo de asesor.\n\n" +
+                        "Detalles del remitente:\n" +
+                        "Nombre: %s %s\n" +
+                        "Correo de contacto: %s\n\n" +
+                        "Se adjunta el archivo PDF proporcionado.\n\n" +
+                        "Saludos cordiales,\n" +
+                        "Orientacion Vocacional",
+                name, lastname, Email
+        );
+
+        helper.setText(emailContent);
+
+
+        helper.addAttachment(archivo.getOriginalFilename(), new ByteArrayResource(archivo.getBytes()));
+
+
+        mailSender.send(message);
+    }
+
+    public void sendHtmlEmail(String to, String subject, String body) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, true);
+            helper.setFrom("jeisson12aaron@gmail.com");
+
+            mailSender.send(message);
+        } catch (MessagingException | MailException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void sendVerificationEmail(String toEmail, String verificationCode) {
+        String subject = "Verificación de correo electrónico";
+        String body = "Hola,\n\n" +
+                "Gracias por registrarte. Por favor, usa el siguiente código para verificar tu correo electrónico:\n\n" +
+                "Código de verificación: " + verificationCode + "\n\n" +
+                "Si no solicitaste este registro, ignora este mensaje.\n\n" +
+                "Gracias.";
+
+        sendHtmlEmail(toEmail, subject, body);
+    }
+
+
+}
+

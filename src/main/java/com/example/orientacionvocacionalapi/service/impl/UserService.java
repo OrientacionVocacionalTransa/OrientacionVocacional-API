@@ -40,6 +40,7 @@ public class UserService {
 
         usuarioRepository.save(user);
     }
+
     public User login(String email, String password) {
         User usuario = usuarioRepository.findByEmail(email);
         if (usuario != null && passwordEncoder.matches(password, usuario.getPassword())) {

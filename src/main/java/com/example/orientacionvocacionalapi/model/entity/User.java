@@ -4,6 +4,7 @@ import com.example.orientacionvocacionalapi.model.enums.ERole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -13,8 +14,11 @@ import lombok.Data;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotNull
+    private String img_profile;
+
     @NotBlank(message = "El nombre es obligatorio")  //
     private String firstName;
 

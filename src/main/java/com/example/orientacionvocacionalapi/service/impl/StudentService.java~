@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class StudentService {
@@ -28,9 +29,11 @@ public class StudentService {
 
     @Autowired
     private StudentMapper studentMapper;
+    @Autowired
+    private EmailService emailService;
 
 
-    public List<StudentDTO> listarTodosLosEstudiantes() {
+    public List<StudentDTO> listAllStudents() {
         List<Student> students = studentRepository.findAll();
         return students.stream()
                 .map(studentMapper::toDTO)
@@ -38,7 +41,7 @@ public class StudentService {
     }
 
 
-    public Optional<Student> obtenerPerfilEstudiantePorEmail(String email) {
+    public Optional<Student> getStudentProfileByEmail(String email) {
         return studentRepository.findByEmail(email);
     }
 
@@ -49,20 +52,47 @@ public class StudentService {
     }
 
     public StudentDTO registerStudent(StudentDTO studentDTO) {
+        Integer randomId = generateUniqueRandomId();
         studentRepository.findByFirstNameAndLastName(studentDTO.getFirstName(), studentDTO.getLastName())
-                .ifPresent(existingAsesor -> {
+                .ifPresent(existingStudent -> {
                     throw new BadRequestException("El estudiante ya existe con el mismo nombre y apellido");
                 });
-        Student student = studentMapper.toEntity(studentDTO);
+        String verificationCode = generateVerificationCode();
+
+        Student estudiante = studentMapper.toEntity(studentDTO);
         ERole eRole = ERole.STUDENT;
 
+        estudiante.setId(randomId);
+        estudiante.setImg_profile("profile.png");
+        estudiante.setFirstName(studentDTO.getFirstName());
+        estudiante.setLastName(studentDTO.getLastName());
+        estudiante.setEmail(studentDTO.getEmail());
+        estudiante.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
+        estudiante.setRole(eRole);
 
-        student.setFirstName(studentDTO.getFirstName());
-        student.setLastName(studentDTO.getLastName());
-        student.setEmail(studentDTO.getEmail());
-        student.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
-        student.setRole(eRole);
-        student = usuarioRepository.save(student);
-        return studentMapper.toDTO(student);
+        estudiante.setVerificationCode(verificationCode); // Guardar el código de verificación
+        estudiante.setVerified(false); // La cuenta está pendiente de verificación
+
+        estudiante = usuarioRepository.save(estudiante);
+        // Enviar el código de verificación por correo electrónico
+        emailServi.sendVerificationEmail(estudiante.getEmail(), verificationCode);
+        emailService.sendVerificationEmail(estudiante.getEmail(), verificationCode);
+
+        return studentMapper.toDTO(estudiante);
+    }
+
+    public String generateVerificationCode() {
+        return String.valueOf((int) (Math.random() * 900000) + 100000); // Genera un código de 6 dígitos
+    }
+
+    private Integer generateUniqueRandomId() {
+        Random random = new Random();
+        Integer randomId;
+
+        do {
+            randomId = 1000000 + random.nextInt(9000000);
+        } while (studentRepository.existsById(Long.valueOf(randomId)));
+
+        return randomId;
     }
 }
