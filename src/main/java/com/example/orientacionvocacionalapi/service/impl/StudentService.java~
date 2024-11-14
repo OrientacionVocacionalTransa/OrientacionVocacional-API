@@ -75,7 +75,7 @@ public class StudentService {
 
         estudiante = usuarioRepository.save(estudiante);
         // Enviar el código de verificación por correo electrónico
-        emailServi.sendVerificationEmail(estudiante.getEmail(), verificationCode);
+
         emailService.sendVerificationEmail(estudiante.getEmail(), verificationCode);
 
         return studentMapper.toDTO(estudiante);

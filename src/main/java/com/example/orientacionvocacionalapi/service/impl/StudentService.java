@@ -6,6 +6,7 @@ import com.example.orientacionvocacionalapi.exception.BadRequestException;
 import com.example.orientacionvocacionalapi.exception.ResourceNotFoundException;
 import com.example.orientacionvocacionalapi.model.entity.Student;
 import com.example.orientacionvocacionalapi.model.enums.ERole;
+import com.example.orientacionvocacionalapi.model.enums.Plan;
 import com.example.orientacionvocacionalapi.repository.StudentRepository;
 import com.example.orientacionvocacionalapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class StudentService {
 
         Student estudiante = studentMapper.toEntity(studentDTO);
         ERole eRole = ERole.STUDENT;
-
+        Plan plan = Plan.FREE;
         estudiante.setId(randomId);
         estudiante.setImg_profile("profile.png");
         estudiante.setFirstName(studentDTO.getFirstName());
@@ -69,13 +70,13 @@ public class StudentService {
         estudiante.setEmail(studentDTO.getEmail());
         estudiante.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
         estudiante.setRole(eRole);
-
+        estudiante.setPlan(plan);
         estudiante.setVerificationCode(verificationCode); // Guardar el código de verificación
         estudiante.setVerified(false); // La cuenta está pendiente de verificación
 
         estudiante = usuarioRepository.save(estudiante);
-        // Enviar el código de verificación por correo electrónico
 
+        // Enviar el código de verificación por correo electrónico
         emailService.sendVerificationEmail(estudiante.getEmail(), verificationCode);
 
         return studentMapper.toDTO(estudiante);
