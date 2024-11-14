@@ -1,0 +1,68 @@
+package com.example.orientacionvocacionalapi.service.impl;
+
+import com.example.orientacionvocacionalapi.Mapper.StudentMapper;
+import com.example.orientacionvocacionalapi.dto.StudentDTO;
+import com.example.orientacionvocacionalapi.exception.BadRequestException;
+import com.example.orientacionvocacionalapi.exception.ResourceNotFoundException;
+import com.example.orientacionvocacionalapi.model.entity.Student;
+import com.example.orientacionvocacionalapi.model.enums.ERole;
+import com.example.orientacionvocacionalapi.repository.StudentRepository;
+import com.example.orientacionvocacionalapi.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class StudentService {
+    @Autowired
+    private UserRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private StudentMapper studentMapper;
+
+
+    public List<StudentDTO> listAllStudents() {
+        List<Student> students = studentRepository.findAll();
+        return students.stream()
+                .map(studentMapper::toDTO)
+                .toList();
+    }
+
+
+    public Optional<Student> getStudentProfileByEmail(String email) {
+        return studentRepository.findByEmail(email);
+    }
+
+    public StudentDTO findById(Long id){
+        Student student = studentRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("El estudiante con ID " + id+ "no fue encontrado"));
+        return studentMapper.toDTO(student);
+    }
+
+    public StudentDTO registerStudent(StudentDTO studentDTO) {
+        studentRepository.findByFirstNameAndLastName(studentDTO.getFirstName(), studentDTO.getLastName())
+                .ifPresent(existingAsesor -> {
+                    throw new BadRequestException("El estudiante ya existe con el mismo nombre y apellido");
+                });
+        Student student = studentMapper.toEntity(studentDTO);
+        ERole eRole = ERole.STUDENT;
+
+
+        student.setFirstName(studentDTO.getFirstName());
+        student.setLastName(studentDTO.getLastName());
+        student.setEmail(studentDTO.getEmail());
+        student.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
+        student.setRole(eRole);
+        student = usuarioRepository.save(student);
+        return studentMapper.toDTO(student);
+    }
+}

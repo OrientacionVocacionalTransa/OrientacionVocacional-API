@@ -26,7 +26,7 @@ public class UserService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void registrarUsuario(UserDTO usuarioDTO) {
+    public void registerUser(UserDTO usuarioDTO) {
 
         User user = new User();
         user.setFirstName(usuarioDTO.getFirstName());
@@ -48,14 +48,14 @@ public class UserService {
         return null;
     }
 
-    public void deleteUser(Long id) throws Exception {
+    public void deleteUser(Integer id) throws Exception {
         User user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
 
         usuarioRepository.delete(user);
     }
 
-    public User getUserById(Long id) throws Exception {
+    public User getUserById(Integer id) throws Exception {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
     }
@@ -64,7 +64,7 @@ public class UserService {
         return usuarioRepository.findAll();
     }
 
-    public void updateAndEncryptPassword(Long id, String newPassword) throws Exception {
+    public void updateAndEncryptPassword(Integer id, String newPassword) throws Exception {
         User user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado con id: " + id));
 

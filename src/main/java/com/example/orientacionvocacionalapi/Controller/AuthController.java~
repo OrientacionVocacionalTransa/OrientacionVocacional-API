@@ -128,7 +128,7 @@ public class AuthController {
     }
 
     @PutMapping("/{id}/encrypt-password")
-    public ResponseEntity<?> updatePassword(@PathVariable Integer id, @RequestParam String newPassword) {
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestParam String newPassword) {
         try {
             userService.updateAndEncryptPassword(id, newPassword);
             return ResponseEntity.ok("Contraseña actualizada y encriptada exitosamente");

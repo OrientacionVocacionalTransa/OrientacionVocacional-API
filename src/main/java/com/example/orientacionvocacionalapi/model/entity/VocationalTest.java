@@ -1,4 +1,4 @@
-package com.example.orientacionvocacionalapi.model;
+package com.example.orientacionvocacionalapi.model.entity;
 
 import java.util.List;
 public class VocationalTest {

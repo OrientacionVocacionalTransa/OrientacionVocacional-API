@@ -1,6 +1,6 @@
 package com.example.orientacionvocacionalapi.Controller;
 
-import com.example.orientacionvocacionalapi.model.entity.Carrera;
+import com.example.orientacionvocacionalapi.model.entity.Career;
 import com.example.orientacionvocacionalapi.model.entity.Ubicacion;
 import com.example.orientacionvocacionalapi.repository.CarreraRepository;
 import com.example.orientacionvocacionalapi.repository.UbicacionRepository;
@@ -31,35 +31,35 @@ public class CarreraController {
     }
 
     @PostMapping("/insertarcarrera")
-    public ResponseEntity<Carrera> agregarCarrera(@RequestParam String nombreCarrera, @RequestParam Long ubicacionId) {
+    public ResponseEntity<Career> agregarCarrera(@RequestParam String nombreCarrera, @RequestParam Long ubicacionId) {
         Ubicacion ubicacion = ubicacionRepository.findById(ubicacionId).orElse(null);
         if (ubicacion == null) {
             return ResponseEntity.badRequest().body(null);
         }
 
-        Carrera carrera = new Carrera();
-        carrera.setNombre(nombreCarrera);
-        carrera.setUbicacion(ubicacion);
+        Career career = new Career();
+        career.setNombre(nombreCarrera);
+        career.setUbicacion(ubicacion);
 
-        Carrera nuevaCarrera = carreraRepository.save(carrera);
-        return ResponseEntity.ok(nuevaCarrera);
+        Career nuevaCareer = carreraRepository.save(career);
+        return ResponseEntity.ok(nuevaCareer);
     }
 
     @GetMapping("/porubicacion/{ubicacionId}")
-    public ResponseEntity<List<Carrera>> obtenerCarrerasPorUbicacion(@PathVariable Long ubicacionId) {
+    public ResponseEntity<List<Career>> obtenerCarrerasPorUbicacion(@PathVariable Long ubicacionId) {
         Ubicacion ubicacion = ubicacionRepository.findById(ubicacionId).orElse(null);
         if (ubicacion == null) {
             return ResponseEntity.badRequest().body(null); // Si no se encuentra la ubicación
         }
 
-        List<Carrera> carreras = carreraRepository.findByUbicacion(ubicacion);
-        return ResponseEntity.ok(carreras);
+        List<Career> careers = carreraRepository.findByUbicacion(ubicacion);
+        return ResponseEntity.ok(careers);
     }
 
     @GetMapping("/mostrarcarreras")
-    public ResponseEntity<List<Carrera>> obtenercarreras(){
-        List<Carrera> carreras = carreraRepository.findAll();
-        return ResponseEntity.ok(carreras);
+    public ResponseEntity<List<Career>> obtenercarreras(){
+        List<Career> careers = carreraRepository.findAll();
+        return ResponseEntity.ok(careers);
     }
 
     @GetMapping("/mostrarubicaciones")
@@ -71,22 +71,22 @@ public class CarreraController {
     @GetMapping("/carreraporID/{carreraId}")
     public ResponseEntity<?> obtenerCarrerasPorID(@PathVariable Long carreraId) {
         try {
-            Carrera carrera = carreraService.getCarreraById(carreraId);
-            return ResponseEntity.ok(carrera);
+            Career career = carreraService.getCarreraById(carreraId);
+            return ResponseEntity.ok(career);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al obtener el usuario: " + e.getMessage());
         }
     }
 
     @GetMapping("/filtrarubicacionexacta")
-    public ResponseEntity<List<Carrera>> filtrarCarrerasPorUbicacion(
+    public ResponseEntity<List<Career>> filtrarCarrerasPorUbicacion(
             @RequestParam String ciudad,
             @RequestParam String region,
             @RequestParam String pais
     ) {
-        List<Carrera> carreras = carreraService.obtenerCarrerasPorUbicacion(ciudad, region, pais);
-        if (carreras != null && !carreras.isEmpty()) {
-            return ResponseEntity.ok(carreras);
+        List<Career> careers = carreraService.obtenerCarrerasPorUbicacion(ciudad, region, pais);
+        if (careers != null && !careers.isEmpty()) {
+            return ResponseEntity.ok(careers);
         } else {
             return ResponseEntity.noContent().build();
         }

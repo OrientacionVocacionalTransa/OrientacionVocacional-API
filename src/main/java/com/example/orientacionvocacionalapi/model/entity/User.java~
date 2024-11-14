@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Table(name = "users")
+@Table(name = "Usuarios")
 @Data
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {

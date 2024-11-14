@@ -6,15 +6,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class UserDTO {
-
+public class AdviserDTO {
     private String firstName;
-
     private String lastName;
-
     private String email;
-
     private String password;
-
-
+    private String specialty;
 }

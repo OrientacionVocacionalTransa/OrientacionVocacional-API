@@ -30,8 +30,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/register", "/auth/registerstudent", "/auth/registerasesor").permitAll() // Rutas públicas
-                        .requestMatchers("/estudiantes/**").hasAnyAuthority(ERole.STUDENT.name(), ERole.ADVISER.name())// Solo ESTUDIANTE
-                        .requestMatchers("/asesores/**").hasAuthority(ERole.ADVISER.name())
+                        .requestMatchers("/estudiantes/**").hasAnyAuthority(ERole.ESTUDIANTE.name(), ERole.ASESOR.name())// Solo ESTUDIANTE
+                        .requestMatchers("/asesores/**").hasAuthority(ERole.ASESOR.name())
                         .requestMatchers("/asesores/perfil").permitAll()// Solo ASESOR
                         .anyRequest().permitAll() // Todas las demás rutas se permiten
                 )

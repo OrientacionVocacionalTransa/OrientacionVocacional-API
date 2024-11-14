@@ -2,10 +2,10 @@
 
 
 El objetivo de este proyecto es desarrollar una aplicación web que facilite la orientación
-vocacional para estudiantes de nivel secundario y universitario. La plataforma conectará a
-los estudiantes con expertos en diversas áreas profesionales, proporcionando
-herramientas para explorar diferentes carreras, evaluar habilidades e intereses, y recibir
-asesoramiento personalizado. Los estudiantes podrán crear perfiles, realizar pruebas de
+vocacional para students de nivel secundario y universitario. La plataforma conectará a
+los students con expertos en diversas áreas profesionales, proporcionando
+herramientas para explorar diferentes careers, evaluar habilidades e intereses, y recibir
+asesoramiento personalizado. Los students podrán crear perfiles, realizar pruebas de
 orientación vocacional, y acceder a recursos que los ayudarán a tomar decisiones
 informadas sobre su futuro académico y profesional.
 
@@ -44,27 +44,27 @@ Mira cómo va avanzando nuestro trabajo visitando el siguiente enlace: [Jira](ht
 #### **Módulo de Evaluación Vocacional:**
 
 - **Realización de pruebas:**
-    - Los estudiantes podrán realizar pruebas de
+    - Los students podrán realizar pruebas de
       orientación vocacional que evalúen sus habilidades, intereses y valores.
-      Estas pruebas generarán informes que ayudarán a los estudiantes a
-      identificar posibles carreras y campos de estudio.
+      Estas pruebas generarán informes que ayudarán a los students a
+      identificar posibles careers y campos de estudio.
 
 - **Resultados Personalizados:**
     - Los informes de las pruebas ofrecerán
-      recomendaciones de carreras y sugerencias de estudios adicionales
+      recomendaciones de careers y sugerencias de estudios adicionales
       basados en los resultados obtenidos.
 
 #### **Módulo de Conexión con Expertos:**
 
 - **Busqueda de Mentores:**
-    - Mentores: Los estudiantes podrán buscar y conectarse con
+    - Mentores: Los students podrán buscar y conectarse con
       profesionales en diversos campos que estén dispuestos a ofrecer
       orientación y asesoramiento.
 
 - **Sesiones de Asesoría:**
-    - Funcionalidad para que los estudiantes puedan
+    - Funcionalidad para que los students puedan
       agendar sesiones de asesoría con expertos. Los expertos pueden
-      proporcionar orientación sobre la elección de carrera, preparación
+      proporcionar orientación sobre la elección de career, preparación
       académica, y otros temas relevantes.
 
 - **Beneficio para los expertos:**
@@ -76,7 +76,7 @@ Mira cómo va avanzando nuestro trabajo visitando el siguiente enlace: [Jira](ht
 
 - **Acceso a contenido:**
     - Integración de artículos, videos, y otros recursos
-      educativos que proporcionen información sobre diferentes carreras,
+      educativos que proporcionen información sobre diferentes careers,
       habilidades necesarias, y tendencias del mercado laboral.
 - **Recomendacios Personalizadas:**
     - Ofrecimiento de contenido
@@ -87,7 +87,7 @@ Mira cómo va avanzando nuestro trabajo visitando el siguiente enlace: [Jira](ht
 
 - **Compra de Servicios de Asesoría:**
     - Integración de un sistema de pagos
-      que permita a los estudiantes pagar por sesiones de asesoría
+      que permita a los students pagar por sesiones de asesoría
       personalizada con expertos o por acceso a recursos exclusivos.
 
 ## Diagramas de la Aplicación

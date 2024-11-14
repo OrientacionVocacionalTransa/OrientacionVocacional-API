@@ -1,0 +1,24 @@
+package com.example.orientacionvocacionalapi.model.entity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.List;
+
+@Entity
+@Data
+public class Question {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String text;
+    private String area;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Option> opciones;
+
+    @Transient
+    private Option selectedOption;
+}
