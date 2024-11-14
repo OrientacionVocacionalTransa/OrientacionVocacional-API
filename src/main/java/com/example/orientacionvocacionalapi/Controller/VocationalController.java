@@ -1,9 +1,10 @@
 package com.example.orientacionvocacionalapi.Controller;
 import com.example.orientacionvocacionalapi.Mapper.QuestionMapper;
 import com.example.orientacionvocacionalapi.dto.QuestionDTO;
-import com.example.orientacionvocacionalapi.model.entity.VocationalTest;
-import com.example.orientacionvocacionalapi.model.entity.Question;
+import com.example.orientacionvocacionalapi.model.entity.*;
 import com.example.orientacionvocacionalapi.repository.QuestionRepository;
+import com.example.orientacionvocacionalapi.repository.TestResultRepository;
+import com.example.orientacionvocacionalapi.service.impl.AreaService;
 import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
 import com.example.orientacionvocacionalapi.service.impl.VocationalTestService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,10 @@ public class VocationalController {
     private VocationalTestService vocationalTestService;
     @Autowired
     private QuestionMapper questionMapper;
+    @Autowired
+    private TestResultRepository testResultRepository;
+    @Autowired
+    private AreaService areaService;
 
     @PostMapping("/submit-register")
     public ResponseEntity<Map<String, Object>> submitVocationalTest(
@@ -49,6 +54,18 @@ public class VocationalController {
                 .map(questionMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    @GetMapping("/results/{userId}")
+    public ResponseEntity<List<Career>> getRecommendedCareers(@PathVariable Long userId) {
+        TestResult result = testResultRepository.findFirstByUserIdOrderByDateRealizationDesc(userId)
+                .orElseThrow(() -> new RuntimeException("No se encontraron resultados para el usuario"));
 
+        return ResponseEntity.ok(result.getRecommendedCareers());
+    }
+
+
+    @GetMapping("/areas")
+    public List<Area> getAreas(){
+        return areaService.findAllArea();
+    }
 }
 
