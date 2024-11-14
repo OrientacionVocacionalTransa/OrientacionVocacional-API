@@ -29,6 +29,8 @@ public class StudentService {
 
     @Autowired
     private StudentMapper studentMapper;
+    @Autowired
+    private EmailService emailService;
 
 
     public List<StudentDTO> listAllStudents() {
@@ -74,7 +76,7 @@ public class StudentService {
         estudiante = usuarioRepository.save(estudiante);
 
 
-
+        emailService.sendVerificationEmail(estudiante.getEmail(), verificationCode);
 
         return studentMapper.toDTO(estudiante);
     }
