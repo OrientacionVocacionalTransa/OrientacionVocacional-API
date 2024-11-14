@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class StudentService {
@@ -49,20 +50,47 @@ public class StudentService {
     }
 
     public StudentDTO registerStudent(StudentDTO studentDTO) {
+        Integer randomId = generateUniqueRandomId();
         studentRepository.findByFirstNameAndLastName(studentDTO.getFirstName(), studentDTO.getLastName())
-                .ifPresent(existingAsesor -> {
+                .ifPresent(existingStudent -> {
                     throw new BadRequestException("El estudiante ya existe con el mismo nombre y apellido");
                 });
-        Student student = studentMapper.toEntity(studentDTO);
+        String verificationCode = generateVerificationCode();
+
+        Student estudiante = studentMapper.toEntity(studentDTO);
         ERole eRole = ERole.STUDENT;
 
+        estudiante.setId(randomId);
+        estudiante.setImg_profile("profile.png");
+        estudiante.setFirstName(studentDTO.getFirstName());
+        estudiante.setLastName(studentDTO.getLastName());
+        estudiante.setEmail(studentDTO.getEmail());
+        estudiante.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
+        estudiante.setRole(eRole);
 
-        student.setFirstName(studentDTO.getFirstName());
-        student.setLastName(studentDTO.getLastName());
-        student.setEmail(studentDTO.getEmail());
-        student.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
-        student.setRole(eRole);
-        student = usuarioRepository.save(student);
-        return studentMapper.toDTO(student);
+        estudiante.setVerificationCode(verificationCode);
+        estudiante.setVerified(false);
+
+        estudiante = usuarioRepository.save(estudiante);
+
+
+
+
+        return studentMapper.toDTO(estudiante);
+    }
+
+    public String generateVerificationCode() {
+        return String.valueOf((int) (Math.random() * 900000) + 100000); // Genera un código de 6 dígitos
+    }
+
+    private Integer generateUniqueRandomId() {
+        Random random = new Random();
+        Integer randomId;
+
+        do {
+            randomId = 1000000 + random.nextInt(9000000);
+        } while (studentRepository.existsById(Long.valueOf(randomId)));
+
+        return randomId;
     }
 }

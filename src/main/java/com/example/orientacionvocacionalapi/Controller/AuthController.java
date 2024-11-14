@@ -4,7 +4,11 @@ import com.example.orientacionvocacionalapi.dto.AdviserDTO;
 import com.example.orientacionvocacionalapi.dto.StudentDTO;
 import com.example.orientacionvocacionalapi.dto.UserDTO;
 import com.example.orientacionvocacionalapi.dto.UserUpdateDTO;
+import com.example.orientacionvocacionalapi.model.entity.Adviser;
+import com.example.orientacionvocacionalapi.model.entity.Student;
 import com.example.orientacionvocacionalapi.model.entity.User;
+import com.example.orientacionvocacionalapi.repository.AdviserRepository;
+import com.example.orientacionvocacionalapi.repository.StudentRepository;
 import com.example.orientacionvocacionalapi.service.impl.AdviserService;
 import com.example.orientacionvocacionalapi.service.impl.StudentService;
 import com.example.orientacionvocacionalapi.service.impl.JwtUtilService;
@@ -13,12 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @RestController
@@ -36,6 +42,12 @@ public class AuthController {
 
     @Autowired
     private AdviserService adviserService;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AdviserRepository adviserRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Validated @RequestBody UserDTO userDTO) {
@@ -63,21 +75,53 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestParam String email, @RequestParam String password) {
         Map<String, String> response = new HashMap<>();
-        User usuario = userService.login(email, password);
+
+        Optional<Student> optionalStudent = studentRepository.findByEmail(email);
+        if (optionalStudent.isPresent()) {
+            Student student = optionalStudent.get();
 
 
-        if (usuario != null) {
+            if (!student.isVerified()) {
+                response.put("message", "Por favor, verifica tu correo electrónico antes de iniciar sesión");
+                return ResponseEntity.badRequest().body(response);
+            }
 
-            String token = jwtUtilService.generateToken(usuario);
 
-            response.put("message", "Login exitoso");
+            if (!passwordEncoder.matches(password, student.getPassword())) {
+                response.put("message", "Contraseña incorrecta");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+
+            String token = jwtUtilService.generateToken(student);
+            response.put("message", "Inicio de sesión exitoso");
             response.put("token", token);
             return ResponseEntity.ok(response);
-        } else {
-            response.put("message", "Credenciales incorrectas");
-            return ResponseEntity.status(401).body(response);
         }
+
+
+        Optional<Adviser> optionalAdvisor = adviserRepository.findByEmail(email);
+        if (optionalAdvisor.isPresent()) {
+            Adviser advisor = optionalAdvisor.get();
+
+
+            if (!passwordEncoder.matches(password, advisor.getPassword())) {
+                response.put("message", "Contraseña incorrecta");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+
+            String token = jwtUtilService.generateToken(advisor);
+            response.put("message", "Inicio de sesión exitoso");
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        }
+
+
+        response.put("message", "Correo electrónico no registrado");
+        return ResponseEntity.badRequest().body(response);
     }
+
     @PutMapping("/update")
     public ResponseEntity<User> updateUserInfo(@RequestHeader("Authorization") String token,
                                                @RequestBody UserUpdateDTO userUpdateDto) {

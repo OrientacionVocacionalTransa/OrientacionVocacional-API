@@ -45,8 +45,8 @@ public class AdviserService {
                 });
         Adviser asesor = adviserMapper.toEntity(adviserDTO);
         ERole eRole = ERole.ADVISER;
-
-
+        asesor.setId(randomId);
+        asesor.setImg_profile("profile.png");
         asesor.setFirstName(adviserDTO.getFirstName());
         asesor.setLastName(adviserDTO.getLastName());
         asesor.setEmail(adviserDTO.getEmail());
@@ -56,6 +56,7 @@ public class AdviserService {
         asesor = userRepository.save(asesor);
         return adviserMapper.toDTO(asesor);
     }
+
 
     private Integer generateUniqueRandomId() {
         Random random = new Random();
