@@ -19,8 +19,7 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class FileStorageService {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+
 
     @Value("${media.location}")
     private String mediaLocation;

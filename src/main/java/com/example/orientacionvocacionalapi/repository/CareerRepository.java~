@@ -9,5 +9,4 @@ import java.util.List;
 
 public interface CareerRepository extends JpaRepository<Career, Long> {
     List<Career> findByLocation(Location location);
-    List<Career> findByAreaId(Long areaId);
 }

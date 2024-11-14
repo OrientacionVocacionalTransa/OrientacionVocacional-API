@@ -1,15 +1,22 @@
 package com.example.orientacionvocacionalapi.Controller;
 
+import com.example.orientacionvocacionalapi.dto.CareerDTO;
 import com.example.orientacionvocacionalapi.model.entity.Career;
 import com.example.orientacionvocacionalapi.model.entity.Location;
+import com.example.orientacionvocacionalapi.model.entity.TestResult;
 import com.example.orientacionvocacionalapi.repository.CareerRepository;
 import com.example.orientacionvocacionalapi.repository.LocationRepository;
+import com.example.orientacionvocacionalapi.repository.TestResultRepository;
 import com.example.orientacionvocacionalapi.service.impl.CareerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/career")
@@ -22,6 +29,8 @@ public class CareerController {
     private LocationRepository locationRepository;
     @Autowired
     private CareerService careerService;
+    @Autowired
+    private TestResultRepository testResultRepository;
 
 
     @PostMapping("/addLocation")
@@ -90,6 +99,25 @@ public class CareerController {
             return ResponseEntity.ok(careers);
         } else {
             return ResponseEntity.noContent().build();
+        }
+    }
+
+    @GetMapping("/by-user/{id}")
+    public ResponseEntity<List<CareerDTO>> getCareersByUserId(@PathVariable Long id) {
+        Optional<TestResult> optionalTestResult = testResultRepository.findByUserId(id);
+        if (optionalTestResult.isPresent()) {
+            TestResult testResult = optionalTestResult.get();
+            Long areaId = testResult.getRecommendedArea().getId();
+
+            List<Career> careers = careerRepository.findByAreaId(areaId);
+            List<CareerDTO> careerDTOs = careers.stream()
+                    .map(career -> new CareerDTO(career.getId(), career.getName(), career.getImg(), career.getDescription(), career.getPriceMonthly(), career.getLocation(), career.getArea().getName()))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(careerDTOs);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.emptyList()); // O podrías devolver un mensaje vacío
         }
     }
 }
