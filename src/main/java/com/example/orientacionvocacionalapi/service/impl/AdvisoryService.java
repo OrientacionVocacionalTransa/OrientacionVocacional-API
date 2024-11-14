@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 @Service
 public class AdvisoryService {
     @Autowired
@@ -117,5 +120,12 @@ public class AdvisoryService {
 
 
         emailService.sendCancellationEmail(studentEmail, advisoryName, advisoryLink, advisoryDate, advisoryTime);
+    }
+
+    public List<AdvisoryDTO> getAdvisoriesByUserId(Integer userId) {
+        List<Advisory> advisories = advisoryRepository.findByStudentIdOrAdviserId(userId, userId);
+        return advisories.stream()
+                .map(advisoryMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
