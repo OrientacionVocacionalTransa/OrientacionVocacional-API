@@ -70,11 +70,11 @@ public class StudentService {
         estudiante.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
         estudiante.setRole(eRole);
 
-        estudiante.setVerificationCode(verificationCode);
-        estudiante.setVerified(false);
+        estudiante.setVerificationCode(verificationCode); // Guardar el código de verificación
+        estudiante.setVerified(false); // La cuenta está pendiente de verificación
 
         estudiante = usuarioRepository.save(estudiante);
-
+        // Enviar el código de verificación por correo electrónico
 
         emailService.sendVerificationEmail(estudiante.getEmail(), verificationCode);
 
