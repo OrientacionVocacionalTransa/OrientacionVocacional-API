@@ -13,7 +13,10 @@ public class Question {
     private Long id;
 
     private String text;
-    private String area;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id")
+    private Area area;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "question", fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -21,4 +24,5 @@ public class Question {
 
     @Transient
     private Option selectedOption;
+
 }
