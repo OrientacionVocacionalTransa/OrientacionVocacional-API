@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Random;
 @Service
 public class AdvisoryService {
@@ -71,5 +73,49 @@ public class AdvisoryService {
 
         return randomId;
     }
+    @Transactional
+    public Advisory updateAdvisory(Integer id, AdvisoryDTO advisoryDTO) {
+        Advisory advisory = advisoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Advisory not found"));
 
+
+        String previousLink = advisory.getLink();
+        String previousName = advisory.getName();
+        LocalDate previousDate = advisory.getDate();
+        LocalTime previousTime = advisory.getTime();
+
+
+        advisory.setLink(advisoryDTO.getLink());
+        advisory.setName(advisoryDTO.getName());
+        advisory.setDate(advisoryDTO.getDate());
+        advisory.setTime(advisoryDTO.getTime());
+
+
+        Advisory updatedAdvisory = advisoryRepository.save(advisory);
+
+
+        emailService.sendReprogrammingEmail(advisory.getStudent().getEmail(), previousLink, previousName, previousDate, previousTime, advisory);
+
+        return updatedAdvisory;
+    }
+
+
+    @Transactional
+    public void deleteAdvisory(Integer id) {
+        Advisory advisory = advisoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Advisory not found"));
+
+
+        String studentEmail = advisory.getStudent().getEmail();
+        String advisoryName = advisory.getName();
+        String advisoryLink = advisory.getLink();
+        LocalDate advisoryDate = advisory.getDate();
+        LocalTime advisoryTime = advisory.getTime();
+
+
+        advisoryRepository.deleteById(id);
+
+
+        emailService.sendCancellationEmail(studentEmail, advisoryName, advisoryLink, advisoryDate, advisoryTime);
+    }
 }

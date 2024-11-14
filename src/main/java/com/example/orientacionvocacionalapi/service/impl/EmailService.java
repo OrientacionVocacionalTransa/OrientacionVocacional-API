@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 @Service
@@ -122,5 +124,38 @@ public class EmailService {
                 "</body>" +
                 "</html>";
     }
+
+    public void sendReprogrammingEmail(String to, String previousLink, String previousName, LocalDate previousDate, LocalTime previousTime, Advisory updatedAdvisory) {
+        String subject = "Reprogramación de Asesoría";
+        String body = "<h1>Su asesoría ha sido reprogramada</h1>"
+                + "<p><strong>Datos anteriores:</strong></p>"
+                + "<p>Nombre: " + previousName + "</p>"
+                + "<p>Link: " + previousLink + "</p>"
+                + "<p>Fecha: " + previousDate + "</p>"
+                + "<p>Hora: " + previousTime + "</p>"
+                + "<br>"
+                + "<p><strong>Datos actualizados:</strong></p>"
+                + "<p>Nombre: " + updatedAdvisory.getName() + "</p>"
+                + "<p>Link: " + updatedAdvisory.getLink() + "</p>"
+                + "<p>Fecha: " + updatedAdvisory.getDate() + "</p>"
+                + "<p>Hora: " + updatedAdvisory.getTime() + "</p>";
+
+        sendHtmlEmail(to, subject, body);
+    }
+
+
+    public void sendCancellationEmail(String to, String name, String link, LocalDate date, LocalTime time) {
+        String subject = "Cancelación de Asesoría";
+        String body = "<h1>Su asesoría ha sido cancelada</h1>"
+                + "<p>Detalles de la asesoría cancelada:</p>"
+                + "<p>Nombre: " + name + "</p>"
+                + "<p>Link: " + link + "</p>"
+                + "<p>Fecha: " + date + "</p>"
+                + "<p>Hora: " + time + "</p>"
+                + "<br><p>Para más información, por favor contacte a su asesor.</p>";
+
+        sendHtmlEmail(to, subject, body);
+    }
+
 }
 
