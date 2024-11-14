@@ -50,7 +50,29 @@ public class StudentController {
     }
 
 
+    @PostMapping("/resend-verification-code")
+    public ResponseEntity<Map<String, String>> resendVerificationCode(@RequestParam String email) {
+        Optional<Student> optionalStudent = studentRepository.findByEmail(email);
 
+        if (optionalStudent.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Estudiante no encontrado"));
+        }
+
+        Student student = optionalStudent.get();
+        if (student.isVerified()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "La cuenta ya está verificada"));
+        }
+
+
+        String newVerificationCode = studentService.generateVerificationCode();
+        student.setVerificationCode(newVerificationCode);
+        studentRepository.save(student);
+
+
+        emailService.sendVerificationEmail(student.getEmail(), newVerificationCode);
+
+        return ResponseEntity.ok(Map.of("message", "Nuevo código de verificación enviado"));
+    }
 
     @GetMapping("/listStudents")
     public ResponseEntity<List<StudentDTO>> listStudents() {
