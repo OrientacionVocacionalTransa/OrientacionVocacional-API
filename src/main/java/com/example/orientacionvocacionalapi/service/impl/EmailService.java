@@ -1,9 +1,12 @@
 package com.example.orientacionvocacionalapi.service.impl;
 
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.mail.MailException;
+
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -37,7 +40,16 @@ public class EmailService {
 
 
 
+    public void sendVerificationEmail(String toEmail, String verificationCode) {
+        String subject = "Verificación de correo electrónico";
+        String body = "Hola,\n\n" +
+                "Gracias por registrarte. Por favor, usa el siguiente código para verificar tu correo electrónico:\n\n" +
+                "Código de verificación: " + verificationCode + "\n\n" +
+                "Si no solicitaste este registro, ignora este mensaje.\n\n" +
+                "Gracias.";
 
+        sendHtmlEmail(toEmail, subject, body);
+    }
 
 
 }
