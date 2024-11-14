@@ -3,7 +3,6 @@ import com.example.orientacionvocacionalapi.dto.AdviserDTO;
 import com.example.orientacionvocacionalapi.model.entity.Adviser;
 import com.example.orientacionvocacionalapi.service.impl.AdviserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,16 +28,6 @@ public class AdviserController {
             return ResponseEntity.ok(adviser.get());
         } else {
             return ResponseEntity.status(404).body("{\"error\": \"Perfil del asesor no encontrado.\"}");
-        }
-    }
-
-    @GetMapping("/getAdviser/{id}")
-    public ResponseEntity<?> adviserById(@PathVariable Long id) {
-        Optional<AdviserDTO> adviser = Optional.ofNullable(adviserService.findById(id));
-        if (adviser.isPresent()) {
-            return ResponseEntity.ok(adviser.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Asesor no encontrado\"}");
         }
     }
 

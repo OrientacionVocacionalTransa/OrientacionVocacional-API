@@ -2,6 +2,7 @@ package com.example.orientacionvocacionalapi.service.impl;
 import com.example.orientacionvocacionalapi.Mapper.AdviserMapper;
 import com.example.orientacionvocacionalapi.dto.AdviserDTO;
 import com.example.orientacionvocacionalapi.exception.BadRequestException;
+import com.example.orientacionvocacionalapi.exception.ResourceNotFoundException;
 import com.example.orientacionvocacionalapi.model.entity.Adviser;
 import com.example.orientacionvocacionalapi.model.enums.ERole;
 import com.example.orientacionvocacionalapi.repository.AdviserRepository;
@@ -35,6 +36,12 @@ public class AdviserService {
         return advisors.stream()
                 .map(adviserMapper::toDTO)
                 .toList();
+    }
+
+    public AdviserDTO findById(Long id){
+        Adviser adviser = adviserRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("El asesor con ID " + id+ "no fue encontrado"));
+        return adviserMapper.toDTO(adviser);
     }
 
     public AdviserDTO registerAdvisor(AdviserDTO adviserDTO) {
