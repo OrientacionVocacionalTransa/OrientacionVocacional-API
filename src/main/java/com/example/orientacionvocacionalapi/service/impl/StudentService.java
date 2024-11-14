@@ -29,6 +29,8 @@ public class StudentService {
 
     @Autowired
     private StudentMapper studentMapper;
+    @Autowired
+    private EmailService emailService;
 
 
     public List<StudentDTO> listAllStudents() {
