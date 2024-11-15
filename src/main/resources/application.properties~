@@ -6,7 +6,7 @@ server.servlet.context-path=/api/v1
 spring.datasource.url=jdbc:postgresql://junction.proxy.rlwy.net:32477/railway
 
 spring.datasource.username=postgres
-spring.datasource.password=iukitvLvEfsyZQRYePdbUCWffTJSeEIn
+spring.datasource.password=eKwxpGOvxRexxueospFYeRfDMqyHUTIW
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 
@@ -18,7 +18,7 @@ spring.jpa.show-sql=true
 
 spring.jpa.properties.hibernate.format_sql=true
 
-spring.sql.init.mode=never
+spring.sql.init.mode=always
 
 spring.sql.init.data-locations=classpath:data-test.sql
 
