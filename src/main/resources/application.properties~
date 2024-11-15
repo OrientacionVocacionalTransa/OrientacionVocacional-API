@@ -2,26 +2,24 @@ spring.application.name=OrientacionVocacional-API
 server.servlet.context-path=/api/v1
 
 
-#Configuracion de base de datos
-#Define la URl de conexion de base de datos
+
 spring.datasource.url=jdbc:postgresql://junction.proxy.rlwy.net:19144/railway
-#Especifica el nombre de usuario para acceder a la base de datos
+
 spring.datasource.username=postgres
 spring.datasource.password=iukitvLvEfsyZQRYePdbUCWffTJSeEIn
 spring.datasource.driver-class-name=org.postgresql.Driver
 
-#Propiedades de JPA/Hibernate
-#adapta las consultas sql a la sintaxis postgre sql
+
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-#significa que hibernate actualizara la estructura de la base de datos
+
 spring.jpa.hibernate.ddl-auto=update
-#permite que se muestre las consultas en la consola
+
 spring.jpa.show-sql=true
-#permite que las consultas mostradas en la consola se formateen de manera mas legible
+
 spring.jpa.properties.hibernate.format_sql=true
-#Indica la inicializacion de la base de datos de un archivo sql en este caso la desactivamos
-spring.sql.init.mode=never
-#Define la location de un archivo sql que contiene datos de prueba
+
+spring.sql.init.mode=always
+
 spring.sql.init.data-locations=classpath:data-test.sql
 
 
