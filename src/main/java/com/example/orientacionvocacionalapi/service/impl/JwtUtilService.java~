@@ -1,6 +1,5 @@
 package com.example.orientacionvocacionalapi.service.impl;
 
-import com.example.orientacionvocacionalapi.model.entity.Student;
 import com.example.orientacionvocacionalapi.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,15 +28,9 @@ public class JwtUtilService {
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
+        claims.put("userId", user.getId());         //claims para obtener info del usuario by jeisson
         claims.put("email", user.getEmail());
         claims.put("role", user.getRole());
-
-
-        if (user instanceof Student) {
-            Student student = (Student) user;
-            claims.put("plan", student.getPlan());
-        }
 
         return createToken(claims, user.getEmail());
     }

@@ -51,7 +51,7 @@ public class PurchaseMapper {
 
     public PurchaseDTO toPurchaseDTO(Purchase purchase){
         PurchaseDTO purchaseDTO = modelMapper.map(purchase, PurchaseDTO.class);
-        purchaseDTO.setUserId(purchase.getUser().getId());
+        purchaseDTO.setUser(purchase.getUser().getFirstName()+" "+purchase.getUser().getLastName());
         purchaseDTO.setItems(purchase.getItems().stream()
                 .map(this::toPurchaseItemDTO)
                 .toList());

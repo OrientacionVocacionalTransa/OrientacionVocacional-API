@@ -1,0 +1,4 @@
+package com.example.orientacionvocacionalapi.Mapper;
+
+public class AdminMapper {
+}

@@ -12,6 +12,4 @@ import lombok.Data;
 public class Adviser extends User{
     @NotBlank(message = "La especialidad es obligatoria")
     private String specialty;
-
-    private boolean needsPasswordChange = true;
 }

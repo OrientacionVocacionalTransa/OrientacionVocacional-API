@@ -34,8 +34,8 @@ public class StudentService {
     private EmailService emailService;
 
 
-    public List<StudentDTO> listAllStudents() {
-        List<Student> students = studentRepository.findAll();
+    public List<StudentDTO> listVerifiedStudents() {
+        List<Student> students = studentRepository.findByVerifiedTrue();
         return students.stream()
                 .map(studentMapper::toDTO)
                 .toList();
@@ -95,5 +95,16 @@ public class StudentService {
         } while (studentRepository.existsById(Long.valueOf(randomId)));
 
         return randomId;
+    }
+
+    public StudentDTO cancelPlan(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante con ID " + studentId + " no encontrado"));
+
+        student.setPlan(Plan.FREE);
+
+        student = studentRepository.save(student);
+
+        return studentMapper.toDTO(student);
     }
 }
