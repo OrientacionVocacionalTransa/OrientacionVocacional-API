@@ -125,12 +125,6 @@ public class EmailService {
                 "</html>";
     }
 
-    public void sendEmailNotification(String receiverEmail, String message) {
-        String subject = "Nuevo mensaje recibido";
-        String body = "Has recibido un nuevo mensaje: " + message;
-        sendHtmlEmail(receiverEmail, subject, body);
-    }
-
     public void sendReprogrammingEmail(String to, String previousLink, String previousName, LocalDate previousDate, LocalTime previousTime, Advisory updatedAdvisory) {
         String subject = "Reprogramación de Asesoría";
         String body = "<h1>Su asesoría ha sido reprogramada</h1>"
