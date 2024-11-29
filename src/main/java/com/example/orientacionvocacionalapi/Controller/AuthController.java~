@@ -160,70 +160,28 @@ public class AuthController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @PostMapping("/change-password")
-    public ResponseEntity<Map<String, Object>> changePassword(@RequestParam String email, @RequestParam String newPassword) {
-        Map<String, Object> response = new HashMap<>();
-
-        Optional<Adviser> optionalAdvisor = adviserRepository.findByEmail(email);
-        if (optionalAdvisor.isPresent()) {
-            Adviser advisor = optionalAdvisor.get();
-
-
-            advisor.setPassword(passwordEncoder.encode(newPassword));
-            advisor.setNeedsPasswordChange(false);
-            adviserRepository.save(advisor);
-
-            response.put("message", "Contraseña cambiada exitosamente");
-            return ResponseEntity.ok(response);
-        }
-
-        response.put("message", "Asesor no encontrado");
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    @PostMapping("/change-password-admin")
-    public ResponseEntity<Map<String, Object>> changePasswordAdmin(@RequestParam String email, @RequestParam String newPassword) {
-        Map<String, Object> response = new HashMap<>();
-
-        Optional<Admin> optionalAdmin = adminRepository.findByEmail(email);
-        if (optionalAdmin.isPresent()) {
-            Admin admin = optionalAdmin.get();
-
-            // Actualiza la contraseña
-            admin.setPassword(passwordEncoder.encode(newPassword));
-            admin.setNeedsPasswordChange(false);
-            adminRepository.save(admin);
-
-            response.put("message", "Contraseña cambiada exitosamente");
-            return ResponseEntity.ok(response);
-        }
-
-        response.put("message", "Admin no encontrado");
-        return ResponseEntity.badRequest().body(response);
-    }
-
     @PutMapping("/update")
-    public ResponseEntity<Map<String, String>> updateUserProfile(@RequestBody Student updatedStudent) {
-        Optional<Student> optionalStudent = studentRepository.findById(Long.valueOf(updatedStudent.getId()));
+    public ResponseEntity<User> updateUserInfo(@RequestHeader("Authorization") String token,
+                                               @RequestBody UserUpdateDTO userUpdateDto) {
 
-        if (optionalStudent.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Estudiante no encontrado"));
+        String jwt = token.substring(7);
+        String email = jwtUtilService.extractUsername(jwt);
+
+
+        User usuario = userService.findByEmail(email);
+        if (usuario != null) {
+
+            usuario.setFirstName(userUpdateDto.getFirstName());
+            usuario.setLastName(userUpdateDto.getLastName());
+            usuario.setEmail(userUpdateDto.getEmail());
+
+
+            User updatedUser = userService.updateUser(usuario);
+
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
-        Student student = optionalStudent.get();
-
-
-        Optional<Student> existingStudent = studentRepository.findByFirstNameAndLastName(updatedStudent.getFirstName(), updatedStudent.getLastName());
-        if (existingStudent.isPresent() && !existingStudent.get().getId().equals(student.getId())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Ya existe un estudiante con el mismo nombre y apellido"));
-        }
-
-        student.setFirstName(updatedStudent.getFirstName());
-        student.setLastName(updatedStudent.getLastName());
-        student.setImg_profile(updatedStudent.getImg_profile());
-
-        studentRepository.save(student);
-        return ResponseEntity.ok(Map.of("message", "Perfil actualizado exitosamente."));
     }
 
     @PutMapping("/update-image")

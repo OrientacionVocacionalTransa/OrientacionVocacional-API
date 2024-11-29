@@ -23,7 +23,7 @@ public class Purchase {
     @Column(name = "payment_status")
     private PaymentStatus paymentStatus;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "FK_purchase_user"))
     private User user;

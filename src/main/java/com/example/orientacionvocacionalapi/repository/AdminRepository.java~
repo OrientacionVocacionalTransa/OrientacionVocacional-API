@@ -1,0 +1,4 @@
+package com.example.orientacionvocacionalapi.repository;
+
+public interface AdminRepository {
+}

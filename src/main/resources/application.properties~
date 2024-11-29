@@ -3,10 +3,12 @@ server.servlet.context-path=/api/v1
 
 
 
-spring.datasource.url=jdbc:postgresql://junction.proxy.rlwy.net:32477/railway
+#spring.datasource.url=jdbc:postgresql://junction.proxy.rlwy.net:32477/railway
+spring.datasource.url=jdbc:postgresql://localhost:5432/vocacional_db
 
 spring.datasource.username=postgres
-spring.datasource.password=eKwxpGOvxRexxueospFYeRfDMqyHUTIW
+#spring.datasource.password=eKwxpGOvxRexxueospFYeRfDMqyHUTIW
+spring.datasource.password=admin
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 
