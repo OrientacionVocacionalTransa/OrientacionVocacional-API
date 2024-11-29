@@ -6,4 +6,5 @@ import lombok.Data;
 public class PaymentCaptureResponse {
     private boolean completed;
     private Integer purchaseId;
+    private String newToken;
 }

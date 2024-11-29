@@ -12,6 +12,6 @@ public class PurchaseDTO {
     private Float total;
     private LocalDateTime createAt;
     private PaymentStatus paymentStatus;
-    private String user;
+    private Integer userId;
     private List<PurchaseItemDTO> items;
 }
