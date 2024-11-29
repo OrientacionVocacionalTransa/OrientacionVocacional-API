@@ -18,8 +18,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat-socket")
-                //.setAllowedOrigins("https://orientacion-vocacional.vercel.app/")
-                .setAllowedOrigins("http://localhost:4200/")
+                .setAllowedOrigins("https://orientacion-vocacional-three.vercel.app/")
                 .withSockJS();
     }
 }

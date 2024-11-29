@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/vocational-test")
-@CrossOrigin(origins = "https://orientacion-vocacional-three.vercel.app/")
+@CrossOrigin(origins = "http://localhost:4200")
 public class VocationalController {
     @Autowired
     private QuestionRepository questionRepository;
