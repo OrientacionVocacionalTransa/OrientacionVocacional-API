@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class CheckoutServiceImpl implements CheckoutService{
     private final PayPalService payPalService;
     private final PurchaseService purchaseService;
+    private final UserService userService;
 
     @Override
     public PaymentOrderResponse createPaymentOrder(Integer purchaseId, String returnUrl, String cancelUrl) {
@@ -38,9 +39,20 @@ public class CheckoutServiceImpl implements CheckoutService{
 
         if (completed) {
             String purchaseIdStr = orderCaptureResponse.getPurchaseUnits().get(0).getReferenceId();
+
+            // Confirmar la compra
             PurchaseDTO purchaseDTO = purchaseService.confirmPurchase(Integer.parseInt(purchaseIdStr));
             paypalCaptureResponse.setPurchaseId(purchaseDTO.getId());
+
+            // Actualizar el plan del estudiante basado en el userId del DTO y obtener el nuevo token si es necesario
+            String newToken = userService.updateStudentPlanToPremium(purchaseDTO.getUserId());
+
+            // Si el plan se actualizó, devolvemos el nuevo token en la respuesta
+            if (newToken != null) {
+                paypalCaptureResponse.setNewToken(newToken);  // Asegúrate de tener un campo para el token en la respuesta
+            }
         }
+
         return paypalCaptureResponse;
     }
 

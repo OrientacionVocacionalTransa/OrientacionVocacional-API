@@ -1,7 +1,10 @@
 package com.example.orientacionvocacionalapi.service.impl;
 
 import com.example.orientacionvocacionalapi.dto.UserDTO;
+import com.example.orientacionvocacionalapi.model.entity.Student;
 import com.example.orientacionvocacionalapi.model.entity.User;
+import com.example.orientacionvocacionalapi.model.enums.Plan;
+import com.example.orientacionvocacionalapi.repository.StudentRepository;
 import com.example.orientacionvocacionalapi.repository.UserRepository;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,6 +31,37 @@ public class UserService {
     private JavaMailSender mailSender;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private JwtUtilService jwtUtilService;
+
+    public String updateStudentPlanToPremium(Integer userId) {
+        Optional<Student> studentOptional = studentRepository.findById(Long.valueOf(userId));
+        if (studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+            if (student.getPlan() != Plan.PREMIUM) {
+                student.setPlan(Plan.PREMIUM);
+                studentRepository.save(student);
+
+                // Después de actualizar el plan, generamos un nuevo token
+                return jwtUtilService.generateToken(student);  // Genera un token con la nueva información
+            }
+        } else {
+            throw new IllegalArgumentException("No se encontró un estudiante con el ID: " + userId);
+        }
+        return null; // Retornamos null si no hubo cambio en el plan
+    }
+
+    public User findById(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public void updateProfileImage(Integer userId, String newFilePath) {
+        User user = findById(userId);
+        user.setImg_profile(newFilePath);
+        userRepository.save(user);
+    }
 
     public void registerUser(UserDTO usuarioDTO) {
 
@@ -77,16 +112,6 @@ public class UserService {
 
 
         usuarioRepository.save(user);
-    }
-
-    public void updateProfileImage(Integer userId, String newFilePath) {
-        User user = findById(userId);
-        user.setImg_profile(newFilePath);
-        userRepository.save(user);
-    }
-
-    public User findById(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public User findByEmail(String email) {
